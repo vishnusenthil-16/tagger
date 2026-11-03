@@ -1,0 +1,7 @@
+{
+  "text": "The application closes unexpectedly when I open a file.",
+  "options": [
+    {"id": "defect", "description": "Software defects"},
+    {"id": "request", "description": "Requests for new functionality"}
+  ]
+}

@@ -34,4 +34,3 @@ D. Reproducible hosted/local configurations. Prove fresh-container startup and c
 E. Publish evidence locally: dataset/model/policy/config hashes, target hardware, counts, accuracy/coverage/no_match metrics, latency, resource use, and test results. Both deployment modes must pass before MVP complete. Gate failures can block runtime acceptance without invalidating an otherwise implementable design.
 
 Design acceptance is authorization to proceed to these implementation gates, not proof they have passed.
-
