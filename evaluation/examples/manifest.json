@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "created_at": "2000-01-01T00:00:00+00:00",
+  "status": "fixture_only",
+  "synthetic": true,
+  "hardware": {
+    "os": "example",
+    "os_release": "example",
+    "architecture": "example",
+    "python": "example",
+    "cpu": "synthetic example",
+    "memory_bytes": 8589934592,
+    "logical_cpus": 4
+  },
+  "hardware_role": "development_host_unconfirmed",
+  "taxonomy_sha256": "9d27dee6b668623286301f8164c5a141c91934896544e4c6cf3cc14c5186235e",
+  "dataset_sha256": "af3f52a38f7924d633e940cab692afb27ca882d4e6e452825556191ad5266140",
+  "split_sha256": {
+    "tuning": "5bb9a8f1bcd0c487185af77593495b96ad9170ab887134ccd222437f0b12e04a",
+    "held_out": "6e468a0225deeacb5c8de3a277f080b7ebbf044747455b3e69f92266418c1325"
+  },
+  "counts": {
+    "tuning": 8,
+    "held_out": 8
+  },
+  "label_counts": {
+    "tuning": {
+      "billing": 2,
+      "support": 2,
+      "meetings": 1,
+      "__none__": 3
+    },
+    "held_out": {
+      "billing": 2,
+      "support": 2,
+      "meetings": 1,
+      "__none__": 3
+    }
+  },
+  "multilingual_in_scope": false,
+  "targets": {
+    "accepted_precision_min": 0.95,
+    "review_rate_max": 0.3,
+    "no_match_precision_min": 0.9,
+    "no_match_recall_min": 0.7,
+    "warm_p95_seconds_max": 2.0,
+    "concurrency": 1,
+    "local_total_peak_rss_bytes_max": 8589934592
+  },
+  "targets_sha256": "397051f96dcf0489304014b79087d320f0484c934d04baeee65ffbc47a4d7434",
+  "quality_gates_passed": false,
+  "held_out_runs": 0
+}
