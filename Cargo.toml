@@ -1,0 +1,47 @@
+[package]
+name = "tagger-service"
+version = "0.2.0"
+edition = "2024"
+description = "Stateless English-text categorization with caller-supplied categories and Jev"
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/vishnusenthil-16/tagger"
+default-run = "tagger"
+include = [
+    "/src/**/*.rs",
+    "/tests/**/*.rs",
+    "/Cargo.toml",
+    "/Cargo.lock",
+    "/README.md",
+    "/LICENSE",
+    "/docs/**",
+    "/examples/**",
+    "/.env.example",
+    "/scripts/*.py",
+    "/evaluation/examples/*",
+    "/evaluation/tests/*.py",
+    "/.github/workflows/*.yml",
+]
+
+[[bin]]
+name = "tagger"
+path = "src/main.rs"
+
+[[bin]]
+name = "tagger-smoke"
+path = "src/bin/smoke.rs"
+
+[dependencies]
+bytes = "1"
+clap = { version = "4", features = ["derive"] }
+http-body-util = "0.1"
+hyper = { version = "1", features = ["server", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+subtle = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "signal", "sync", "time", "io-util"] }
+
+[lints.rust]
+unsafe_code = "forbid"

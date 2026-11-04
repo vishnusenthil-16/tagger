@@ -2,7 +2,7 @@
 
 ## Configuration
 
-All settings are server-side environment variables. Missing required settings or invalid limits fail startup without printing values. No `.env` file is loaded implicitly. Runtime and development dependencies are pinned in `pyproject.toml`; transitive resolution is in `uv.lock`.
+All settings are server-side environment variables. Missing required settings or invalid limits fail startup without printing values. No `.env` file is loaded implicitly. Dependency requirements are in `Cargo.toml`; exact resolution is committed in `Cargo.lock`. Use `--locked` for builds.
 
 | Variable | Default / requirement |
 | --- | --- |
@@ -69,7 +69,7 @@ A `200` response always includes all fields, with explicit `null` for unavailabl
 
 `distribution` always contains all supplied IDs plus `__none__`, in that order. Raw numeric values are preserved, not normalized. `provider_confidence` is a separately reported provider statistic, not computed by Tagger; see the Jev definition in the backend notes. Missing/nonnumeric confidence becomes `null`, while nonfinite or out-of-range numeric confidence is rejected. Configured and reported model identities remain separate; omitted provenance is never fabricated.
 
-The complete typed contract and error table are in [PLAN.md](plan/v_1/PLAN.md). [openapi.json](openapi.json) is a generated schema artifact; interactive documentation and unauthenticated schema routes are not served by the runtime.
+The complete typed contract and error table are in [PLAN.md](plan/v_1/PLAN.md). [openapi.json](openapi.json) is the checked-in HTTP contract artifact; interactive documentation and unauthenticated schema routes are not served by the runtime.
 
 ## Failures and capacity
 
@@ -83,6 +83,8 @@ Use `code`, HTTP status and `retryable`, not the message. `true` means a later u
 
 The wall-clock deadline covers uploading, validation and upstream work. Expiry before the upstream attempt is `408 request_timeout`; after the attempt starts it is `504 backend_timeout`. Body size is enforced incrementally even without `Content-Length`. Backend responses are streamed with a fixed 1 MiB cap and must be uncompressed JSON. Oversized/invalid responses return `502 backend_invalid_output`.
 
-A full process returns `503 overloaded` immediately. Slots remain held until upstream completion or local cancellation cleanup. Client disconnect cancels in-flight work best-effort; closing an HTTP call cannot stop remote computation reliably. Multiple processes multiply the cap. The provided CLI runs one worker; there is no distributed cap, queue, rate limiter or health endpoint. External rate limits may return `429`; those responses are not Tagger's error envelope. Bound aggregate connections/uploads in the HTTP server or surrounding infrastructure when needed.
+A full process returns `503 overloaded` immediately. Slots remain held until upstream completion or local cancellation cleanup. Client disconnect cancels in-flight work best-effort; closing an HTTP call cannot stop remote computation reliably. Multiple processes multiply the cap. The provided CLI runs one process with a Tokio runtime; there is no distributed cap, queue, rate limiter or health endpoint. External rate limits may return `429`; those responses are not Tagger's error envelope. Bound aggregate connections/uploads in the HTTP server or surrounding infrastructure when needed.
 
 Only outcome, backend and elapsed timing are logged. Access-path logging is off in the CLI. No requests, category descriptions, provider bodies, credentials or raw exceptions are persisted. Independently configured server/proxy logs are the operator's responsibility.
+
+See [Rust migration notes](rust-migration.md) for malformed HTTP/Unicode handling and shutdown behavior.

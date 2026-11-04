@@ -1,5 +1,7 @@
 # Implementation and validation evidence
 
+> Historical Python implementation evidence. These checks and live results do not certify the Rust rewrite. See [Rust migration and validation](rust-migration.md) for current evidence.
+
 Date: **2026-11-02**. V1 scope: **upstream Jev only**. This is implementation evidence, not an independent code review or an accuracy benchmark.
 
 ## Gate status
@@ -47,7 +49,8 @@ Four preliminary direct synthetic requests are not counted in the 3/3 end-to-end
 Run the local commands in [README.md](../README.md). For live checks, inject the selected backend configuration and credential with your secret manager, then run:
 
 ```sh
-uv run python scripts/run_live_smoke.py
+cargo build --locked --release --bins
+python3 scripts/run_live_smoke.py
 ```
 
 This makes three real upstream requests. Alternatively, use `tagger-smoke` against an already-running service. Neither path stores credentials or changes model infrastructure. See [backend notes](backends.md) for precision and truncation caveats and [usage](usage.md) for limits and errors.

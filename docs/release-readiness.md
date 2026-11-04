@@ -1,5 +1,7 @@
 # Jev-only v1 release readiness
 
+> Historical Python implementation evidence. These checks and live results do not certify the Rust rewrite. See [Rust migration and validation](rust-migration.md) for current evidence.
+
 Assessment date: 2026-11-02. Initial package version: `0.1.0`; HTTP API version: `/v1`. “V1” describes the service scope/API, not a change to package version `1.0.0`.
 
 ## Scope
