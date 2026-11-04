@@ -30,6 +30,7 @@ include = [
     "/docs",
     "/examples",
     "/.github/workflows/ci.yml",
+    "/.github/workflows/release.yml",
     "/.env.example",
     "/README.md",
     "/LICENSE",
