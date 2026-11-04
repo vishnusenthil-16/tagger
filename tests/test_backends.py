@@ -203,3 +203,34 @@ async def test_huge_numeric_probability_is_invalid_not_internal_error(settings, 
         result = await client.post("/v1/classify", json=payload)
     assert result.status_code == 502
     assert result.json()["error"]["code"] == "backend_invalid_output"
+
+
+@pytest.mark.parametrize("category_count", [199, 254])
+@pytest.mark.parametrize("has_mass", [False, True], ids=["zero-mass", "rounded-positive-mass"])
+async def test_large_category_distribution_mass(settings, category_count, has_mass):
+    settings = settings.model_copy(update={"max_categories": category_count})
+    options = [
+        {"id": f"category_{i}", "description": f"Category {i}"} for i in range(category_count)
+    ]
+    probabilities = {option["id"]: 0.0 for option in options}
+    probabilities["__none__"] = 0.0
+    if has_mass:
+        # A valid two-decimal rounded distribution sums to 0.99, not exactly 1.
+        for option in options[:3]:
+            probabilities[option["id"]] = 0.33
+
+    async def handler(request):
+        return response(data=provider_result(probabilities, "category_0"))
+
+    async with service(settings, handler) as (_, client, calls):
+        result = await client.post("/v1/classify", json={"text": "Content", "options": options})
+    assert len(calls) == 1
+    if has_mass:
+        assert result.status_code == 200
+        assert result.json()["status"] == "needs_review"
+        assert {item["id"]: item["probability"] for item in result.json()["distribution"]} == (
+            probabilities
+        )
+    else:
+        assert result.status_code == 502
+        assert result.json()["error"]["code"] == "backend_invalid_output"

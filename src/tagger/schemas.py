@@ -113,7 +113,9 @@ def interpret_result(
     scores = list(probabilities.values())
     if any(type(p) not in (float, int) or not 0 <= p <= 1 or not math.isfinite(p) for p in scores):
         raise invalid
-    if abs(math.fsum(scores) - 1) > sum_tolerance:
+    total = math.fsum(scores)
+    # Rounding tolerance grows with option count, but cannot justify zero mass.
+    if total <= 0 or abs(total - 1) > sum_tolerance:
         raise invalid
     maximum = max(scores)
     winners = [i for i in ids if probabilities[i] == maximum]
