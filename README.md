@@ -64,6 +64,29 @@ uv build
 
 Tests use synthetic local providers and never consume external API keys. The historical evaluation scripts are optional and are not service acceptance gates. See the [implementation plan](docs/plan/v_1/PLAN.md).
 
+## Releases
+
+The [release workflow](.github/workflows/release.yml) publishes a wheel (`.whl`)
+and source archive (`.tar.gz`) to GitHub Releases when a stable version tag such
+as `v0.1.0` is pushed. It does not publish to PyPI.
+
+Maintainers: update `project.version` in `pyproject.toml`, run `uv lock`, and merge
+that change into `main` first. From an up-to-date `main` checkout, create and push
+an annotated, signed tag matching the package version:
+
+```sh
+git tag -s v0.1.0 -m "Release v0.1.0"
+git push origin v0.1.0
+```
+
+The workflow rejects mismatched versions, non-stable tags, and commits outside
+`main` history. Lint, formatting, tests, and builds must pass before publishing.
+PRs touching the workflow or package metadata exercise the build job without
+release-write permissions; only tag runs can publish.
+
+Existing releases are not overwritten. If a run fails, inspect its logs and any
+existing release/draft before retrying; do not move an already-published tag.
+
 ## License
 
 [Apache-2.0](LICENSE).
