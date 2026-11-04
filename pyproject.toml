@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tagger-service"
+version = "0.1.0"
+description = "Stateless English-text categorization with caller-supplied categories and Jev"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.162.0",
+    "httpx==0.28.1",
+    "pydantic==2.14.2",
+    "uvicorn==0.54.0",
+]
+
+[project.scripts]
+tagger = "tagger.cli:main"
+tagger-smoke = "tagger.smoke:main"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/tagger",
+    "/tests",
+    "/scripts",
+    "/evaluation/examples",
+    "/docs",
+    "/examples",
+    "/.github/workflows/ci.yml",
+    "/.env.example",
+    "/README.md",
+    "/LICENSE",
+    "/pyproject.toml",
+    "/uv.lock",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tagger"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+    "pytest-asyncio==1.4.1.post1",
+    "ruff==0.17.3",
+]

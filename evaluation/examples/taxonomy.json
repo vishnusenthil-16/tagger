@@ -1,0 +1,14 @@
+[
+  {
+    "id": "billing",
+    "description": "Invoices, payments, refunds, and billing questions."
+  },
+  {
+    "id": "support",
+    "description": "Technical faults and requests for product troubleshooting."
+  },
+  {
+    "id": "meetings",
+    "description": "Meeting invitations, scheduling, and calendar changes."
+  }
+]
