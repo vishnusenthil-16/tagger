@@ -14,3 +14,6 @@ dist/
 
 # Conversation attachments are not project source or release inputs.
 media/
+
+# Rust build and package artifacts.
+/target/

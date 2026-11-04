@@ -6,6 +6,7 @@ random, exists only in child environments, and is never printed or persisted.
 
 import json
 import os
+from pathlib import Path
 import secrets
 import socket
 import subprocess
@@ -24,8 +25,12 @@ def main() -> int:
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
+    binaries = Path(__file__).resolve().parents[1] / "target" / "release"
+    if not all((binaries / name).is_file() for name in ("tagger", "tagger-smoke")):
+        print("Build first: cargo build --locked --release --bins", file=sys.stderr)
+        return 2
     process = subprocess.Popen(
-        [sys.executable, "-m", "tagger.cli", "--host", "127.0.0.1", "--port", str(port)],
+        [str(binaries / "tagger"), "--host", "127.0.0.1", "--port", str(port)],
         env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
@@ -43,9 +48,7 @@ def main() -> int:
                 time.sleep(0.025)
         smoke = subprocess.run(
             [
-                sys.executable,
-                "-m",
-                "tagger.smoke",
+                str(binaries / "tagger-smoke"),
                 "--url",
                 f"http://127.0.0.1:{port}",
                 "--expect-backend",
