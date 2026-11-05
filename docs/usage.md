@@ -69,7 +69,7 @@ A `200` response always includes all fields, with explicit `null` for unavailabl
 
 `distribution` always contains all supplied IDs plus `__none__`, in that order. Raw numeric values are preserved, not normalized. `provider_confidence` is a separately reported provider statistic, not computed by Tagger; see the Jev definition in the backend notes. Missing/nonnumeric confidence becomes `null`, while nonfinite or out-of-range numeric confidence is rejected. Configured and reported model identities remain separate; omitted provenance is never fabricated.
 
-The complete typed contract and error table are in [PLAN.md](plan/v_1/PLAN.md). [openapi.json](openapi.json) is the checked-in HTTP contract artifact; interactive documentation and unauthenticated schema routes are not served by the runtime.
+[openapi.json](openapi.json) is the checked-in HTTP contract artifact; interactive documentation and unauthenticated schema routes are not served by the runtime.
 
 ## Failures and capacity
 
@@ -87,4 +87,36 @@ A full process returns `503 overloaded` immediately. Slots remain held until ups
 
 Only outcome, backend and elapsed timing are logged. Access-path logging is off in the CLI. No requests, category descriptions, provider bodies, credentials or raw exceptions are persisted. Independently configured server/proxy logs are the operator's responsibility.
 
-See [Rust migration notes](rust-migration.md) for malformed HTTP/Unicode handling and shutdown behavior.
+## Transport and shutdown
+
+The supported interface is the HTTP API and the `tagger` and `tagger-smoke` executables, not a Rust library API. Tokio handles asynchronous I/O, Hyper handles HTTP/1 connections, and Reqwest uses Rustls for TLS. Capacity permits are released on success, failure, timeout, or local cancellation.
+
+Malformed Unicode escapes, including lone surrogates, return `422 invalid_request`. Excessively nested JSON is rejected by the parser. Blank-field checks include Unicode whitespace and ASCII separators U+001C–U+001F.
+
+Malformed HTTP framing or header syntax may be rejected by Hyper before application handling, with a transport-level response or a closed connection instead of the JSON error envelope.
+
+SIGINT/SIGTERM stops admission and cancels local connection tasks without waiting for remote model completion. Local cancellation does not guarantee that remote computation stops.
+
+## Error reference
+
+| Condition | HTTP | `error.code` | `retryable` |
+| --- | --- | --- | --- |
+| Missing or invalid Tagger client credentials | 401 | `unauthorized` | false |
+| Total deadline exceeded before the upstream attempt starts | 408 | `request_timeout` | true |
+| Request body exceeds cap | 413 | `request_too_large` | false |
+| Non-JSON content type or unsupported body encoding (anything other than absent/identity) | 415 | `unsupported_media_type` | false |
+| Invalid JSON, field types, or unexpected/missing fields | 422 | `invalid_request` | false |
+| Empty/whitespace-only or oversized text | 422 | `invalid_text` | false |
+| Category count outside allowed range | 422 | `invalid_category_count` | false |
+| Duplicate or invalid category ID | 422 | `invalid_category_id` | false |
+| Empty/whitespace-only or oversized description | 422 | `invalid_category_description` | false |
+| Verified adapter input limit exceeded or explicit, verified upstream context/token-limit rejection | 422 | `backend_input_limit_exceeded` | false |
+| Invalid upstream output, including malformed distributions | 502 | `backend_invalid_output` | false |
+| Verified upstream authentication/authorization rejection | 502 | `backend_auth_failed` | false |
+| Unexpected upstream status or error not mapped to a verified condition | 502 | `backend_error` | false |
+| Transport failure (DNS/connect/TLS/read/write failure), or upstream `429`/`529` | 503 | `backend_unavailable` | true |
+| No per-process upstream capacity available | 503 | `overloaded` | true |
+| Total deadline exceeded after the upstream attempt starts, or upstream transport timeout | 504 | `backend_timeout` | true |
+| Unknown Tagger route | 404 | `not_found` | false |
+| Unsupported method on a known route | 405 | `method_not_allowed` | false |
+| Unexpected internal service failure | 500 | `internal_error` | false |

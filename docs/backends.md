@@ -40,7 +40,7 @@ Choice confidence summarizes the largest probability relative to a uniform distr
 
 Four preliminary synthetic direct calls to `jev-1.14.0` returned probability values at two-decimal precision, including `[0.16, 0.68, 0.14, 0.02]` and `[0.33, 0.14, 0.52, 0.01]`. The API describes the sum as approximate but does not specify a universal rounding precision. The adapter therefore uses an **observed-profile tolerance**, not a provider-wide guarantee: `option_count × 0.005 + 1e-12`. The tiny epsilon accounts for binary arithmetic at the boundary. At the default 20 total options this allows a sum deviation up to 0.1; this is the worst-case independent two-decimal rounding bound, not normalization or an accuracy threshold. Independently of this tolerance, the returned scores must have strictly positive total mass; all-zero output is rejected as `502 backend_invalid_output`, including at the maximum option count.
 
-These preliminary precision observations are separate from the three end-to-end validation calls. See [validation evidence](validation.md).
+See [validation](validation.md) for local contract coverage and live smoke testing.
 
 A caller choosing a different model/server version must recheck its precision contract; the tolerance is a profile assumption and is not inferred from arbitrary response values. Exact public ties are determined from the **returned** probabilities. A provider may select any tied maximum; Tagger chooses the first in caller order for `candidate`. No real exact-tie case has been induced; all tie branches have local contract tests.
 

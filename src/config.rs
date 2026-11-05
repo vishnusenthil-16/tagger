@@ -26,8 +26,8 @@ impl std::error::Error for ConfigError {}
 pub(crate) fn valid_key(key: &str) -> bool {
     !key.is_empty() && key.bytes().all(|b| (33..=126).contains(&b))
 }
-// Python's original nonblank contract also treats these four ASCII separators
-// as whitespace. Preserve it rather than silently accepting control-only text.
+// Treat ASCII separators as blank alongside Unicode whitespace so that
+// control-only text cannot satisfy the nonblank input requirement.
 pub(crate) fn is_blank(value: &str) -> bool {
     value
         .chars()

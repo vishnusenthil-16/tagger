@@ -1,6 +1,6 @@
 [package]
 name = "tagger-service"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "Stateless English-text categorization with caller-supplied categories and Jev"
 license = "Apache-2.0"
@@ -17,9 +17,6 @@ include = [
     "/docs/**",
     "/examples/**",
     "/.env.example",
-    "/scripts/*.py",
-    "/evaluation/examples/*",
-    "/evaluation/tests/*.py",
     "/.github/workflows/*.yml",
 ]
 

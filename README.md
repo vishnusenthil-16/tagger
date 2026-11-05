@@ -1,10 +1,10 @@
 # Tagger
 
-Tagger is a stateless HTTP service that categorizes English text using categories supplied with each request. It calls a user-managed Jev endpoint; it does not host models or store categories.
+Tagger is a stateless Rust HTTP service that categorizes English text using categories supplied with each request. It calls a user-managed Jev endpoint; it does not host models or store categories.
 
 ## Install
 
-Requires the current stable Rust toolchain (tested with Rust 1.99.1). The service and smoke CLI have no Python runtime dependency.
+Requires the current stable Rust toolchain (tested with Rust 1.99.1).
 
 ```sh
 cargo build --locked --release --bins
@@ -42,7 +42,7 @@ V1 supports only Jev; selecting another backend fails startup. No request can ov
 
 The Jev adapter targets `POST /v1/systemone`. Use the endpoint's **service root** (optionally including a reverse-proxy prefix), not a URL already ending in `/v1` or `/systemone`.
 
-[Jev compatibility notes](docs/backends.md) distinguish documented contracts, local synthetic tests, and live verification. [Rust validation](docs/rust-migration.md) records the current checks. Earlier [Python validation evidence](docs/validation.md) and [release assessment](docs/release-readiness.md) remain historical. Model provisioning and deployment remain the endpoint owner's responsibility.
+[Jev compatibility notes](docs/backends.md) describe the wire contract and adapter limits. [Validation](docs/validation.md) describes automated checks and live smoke testing. Model provisioning and deployment remain the endpoint owner’s responsibility.
 
 To send three synthetic contract checks through an already-running Tagger instance:
 
@@ -50,7 +50,7 @@ To send three synthetic contract checks through an already-running Tagger instan
 ./target/release/tagger-smoke --url http://127.0.0.1:8080 --expect-backend jev
 ```
 
-This uses `TAGGER_API_KEY`. It makes three real backend calls and checks the response contract, not accuracy. For a temporary local process, inject the backend settings and run `python3 scripts/run_live_smoke.py` (optional Python standard-library orchestration); its service-client key is generated in memory and the process stops after the checks.
+This uses `TAGGER_API_KEY`. It makes three real backend calls and checks the response contract, not accuracy.
 
 ## Development
 
@@ -63,17 +63,13 @@ cargo build --locked --release --bins
 cargo package --locked --target-dir target/package-check
 ```
 
-Tests use synthetic local providers and never consume external API keys. The historical evaluation scripts are optional and are not service acceptance gates. Run their standard-library tests with `python3 -m unittest discover -s evaluation/tests -v`. See the [implementation plan](docs/plan/v_1/PLAN.md).
+Tests use synthetic local providers and never consume external API keys.
 
 ## Releases
 
-The [release workflow](.github/workflows/release.yml) builds Linux x86-64 and macOS ARM64 binary archives plus a Cargo source archive (`.crate`). Stable version tags such as `v0.1.0` publish these to GitHub Releases, not crates.io. The Linux binary targets the runner's glibc; it is not a portable static build.
+The [release workflow](.github/workflows/release.yml) builds Linux x86-64 and macOS ARM64 binary archives plus a Cargo source archive (`.crate`). Stable version tags such as `v0.2.1` publish these to GitHub Releases, not crates.io. The Linux binary targets the runner's glibc; it is not a portable static build.
 
-Update `package.version` in `Cargo.toml` and the lockfile, pass CI, and merge to `main` before creating an annotated signed tag matching the version. The workflow rejects mismatched/non-stable tags and commits outside `main` history. It never overwrites an existing release. No release or deployment is performed by this rewrite.
-
-## Rust migration
-
-The HTTP endpoint, environment settings, Jev wire format, error envelope, and deterministic classification rules are retained. See [migration notes](docs/rust-migration.md) for transport-level differences and verification scope. The Python service and its packaging have been replaced; the optional historical evaluation preparation tool remains Python and is not a runtime dependency.
+Update `package.version` in `Cargo.toml` and the lockfile, pass CI, and merge to `main` before creating an annotated signed tag matching the version. The workflow rejects mismatched/non-stable tags and commits outside `main` history. It never overwrites an existing release.
 
 ## License
 
