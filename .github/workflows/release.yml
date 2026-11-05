@@ -37,19 +37,16 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import re
-          import subprocess
-          metadata = json.loads(subprocess.check_output(["cargo", "metadata", "--locked", "--no-deps", "--format-version", "1"]))
-          version = metadata["packages"][0]["version"]
-          tag = os.environ["RELEASE_TAG"]
-          if not re.fullmatch(r"v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)", tag):
-              raise SystemExit("Release tags must use stable vMAJOR.MINOR.PATCH format")
-          if tag != f"v{version}":
-              raise SystemExit("Release tag must match Cargo.toml package.version")
-          PY
+          set -euo pipefail
+          if [[ ! "$RELEASE_TAG" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo 'Release tags must use stable vMAJOR.MINOR.PATCH format' >&2
+            exit 1
+          fi
+          version=$(cargo metadata --locked --no-deps --format-version 1 | jq -er '.packages[] | select(.name == "tagger-service") | .version')
+          if [[ "$RELEASE_TAG" != "v$version" ]]; then
+            echo 'Release tag must match Cargo.toml package.version' >&2
+            exit 1
+          fi
           git merge-base --is-ancestor HEAD origin/main
       - run: cargo fmt --all --check
       - run: cargo clippy --locked --all-targets -- -D warnings

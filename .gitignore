@@ -1,19 +1,14 @@
-__pycache__/
-*.py[cod]
-.venv/
-# Real email inputs and generated evidence stay local by default.
-evaluation/private/
-evaluation/runs/
 .env
 .env.*
 !.env.example
-.pytest_cache/
-.ruff_cache/
-dist/
-*.egg-info/
+/dist/
+
+# Private evaluation inputs and generated evidence stay local.
+/evaluation/private/
+/evaluation/runs/
 
 # Conversation attachments are not project source or release inputs.
-media/
+/media/
 
 # Rust build and package artifacts.
 /target/
