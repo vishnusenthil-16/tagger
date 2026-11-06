@@ -32,6 +32,12 @@ curl --fail-with-body http://127.0.0.1:8080/v1/classify \
 
 The JSON result contains a `classified`, `no_match`, or `needs_review` status, a label/candidate, the full probability distribution, and model provenance. Scores are model suggestions, not accuracy guarantees. The example's categories are not built into the service.
 
+## Agent skill
+
+The [Tagger skill](skills/tagger/SKILL.md) gives agents a complete calling workflow, result interpretation, troubleshooting, and a separate server-setup path.
+
+To make it discoverable, copy or symlink the entire `skills/tagger` directory into your agent's configured skill directory. For Codex, use `${CODEX_HOME:-$HOME/.codex}/skills/tagger`; for OpenClaw, use a configured skill directory. Repository presence alone does not install the skill. The skill works standalone for calling an existing service; detailed reference docs remain in this checkout. Refresh copied installations when the skill changes.
+
 ## Configuration and API
 
 See [configuration and usage](docs/usage.md) for request limits, authentication, result/error schemas and concurrency behavior. [.env.example](.env.example) lists settings without real credentials.

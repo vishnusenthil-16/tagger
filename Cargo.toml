@@ -15,6 +15,7 @@ include = [
     "/README.md",
     "/LICENSE",
     "/docs/**",
+    "/skills/**",
     "/examples/**",
     "/.env.example",
     "/.github/workflows/*.yml",
